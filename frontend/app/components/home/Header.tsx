@@ -31,15 +31,6 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-400 to-transparent drop-shadow-sm"></div>
       </div>
 
-      <div className="mt-4 flex justify-center">
-        <div className="bg-blue-50 inline-flex items-center px-4 py-2 rounded-full border border-blue-100 shadow-sm animate-in fade-in zoom-in duration-500">
-          <span className="text-lg mr-2">🏆</span>
-          <p className="text-sm font-bold text-blue-800">
-            {globalWinCount} Senseis cleared this student today!
-          </p>
-        </div>
-      </div>
-
       {!isGameOver && (
         <p className="text-slate-600 mt-6 font-medium text-lg">
           Guess the random student of the day!
@@ -54,6 +45,15 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </p>
       )}
+      <div className="mt-4 flex justify-center">
+        <div className="bg-blue-50 inline-flex items-center px-4 py-2 rounded-full border border-blue-100 shadow-sm animate-in fade-in zoom-in duration-500">
+          <span className="text-lg mr-2">🏆</span>
+          <p className="text-sm font-bold text-blue-800">
+            {globalWinCount} Sensei{globalWinCount != 1 && "s"} cleared this
+            student today!
+          </p>
+        </div>
+      </div>
     </header>
   );
 };

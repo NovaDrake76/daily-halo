@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Daily Halo",
   },
   description:
-    "Can you guess the Blue Archive student from their Halo? A new challenge every day!",
+    "Can you guess the Blue Archive student? A new challenge every day!",
   keywords: [
     "Blue Archive",
     "Wordle",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Daily Halo - Blue Archive Guess",
     description:
-      "Test your knowledge, Sensei! Can you identify the student just by their Halo?",
+      "Test your knowledge, Sensei! Can you identify the random student?",
     url: BASE_URL,
     siteName: "Daily Halo",
     locale: "en_US",

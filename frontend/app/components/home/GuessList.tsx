@@ -18,7 +18,7 @@ export const GuessList: React.FC<GuessListProps> = ({ guesses }) => {
         >
           <div className="flex items-center gap-4 mb-4 border-b border-slate-100 pb-3">
             <div className="w-24 h-24 rounded-full bg-slate-100 overflow-hidden ring-2 ring-slate-200 shrink-0">
-              <div className="w-40 overflow-hidden flex">
+              <div className="w-36 overflow-hidden flex">
                 <img
                   src={guess.student.studentImage}
                   alt={guess.student.name}
@@ -30,20 +30,10 @@ export const GuessList: React.FC<GuessListProps> = ({ guesses }) => {
               <p className="font-black text-slate-800 text-lg leading-none">
                 {guess.student.name}
               </p>
-              <div className="flex gap-0.5 mt-1">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={`text-xs ${i < guess.student.rarity ? "text-amber-400" : "text-slate-200"}`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2">
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-10 [&>*]:col-span-1 md:[&>*]:col-span-2 md:[&>*:nth-child(6)]:col-start-2">
             <AttributeBox
               label="Academy"
               value={guess.student.academy}
@@ -64,18 +54,24 @@ export const GuessList: React.FC<GuessListProps> = ({ guesses }) => {
               delay={100}
             />
             <AttributeBox
+              label="Rarity"
+              value={"★".repeat(guess.student.rarity)}
+              status={guess.matches.rarity}
+              delay={125}
+            />
+            <AttributeBox
               label="Attack"
               value={guess.student.attackType}
               status={guess.matches.attackType}
               delay={150}
             />
+
             <AttributeBox
               label="Defense"
               value={guess.student.defenseType}
               status={guess.matches.defenseType}
               delay={200}
             />
-
             <AttributeBox
               label="Height"
               value={`${guess.student.height}cm`}

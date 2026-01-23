@@ -49,6 +49,7 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
       if (l === "age") return "The correct student is Older ↑";
       if (l === "height") return "The correct student is Taller ↑";
       if (l === "year") return "The correct student is in a Higher Grade ↑";
+      if (l === "rarity") return "The correct student has More Stars ↑";
       return "The correct value is Higher ↑";
     }
 
@@ -56,6 +57,7 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
       if (l === "age") return "The correct student is Younger ↓";
       if (l === "height") return "The correct student is Shorter ↓";
       if (l === "year") return "The correct student is in a Lower Grade ↓";
+      if (l === "rarity") return "The correct student has Fewer Stars ↓";
       return "The correct value is Lower ↓";
     }
 
@@ -84,6 +86,13 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
       <div className="flex items-center gap-1 z-10">
         <span className="text-xs md:text-sm font-black uppercase text-center leading-tight truncate px-1">
           {value}
+          {icon && (
+            <img
+              src={icon}
+              alt={label}
+              className="inline-block w-8 h-8 object-contain ml-1 -mt-1"
+            />
+          )}
         </span>
 
         {status === "HIGHER" && (

@@ -122,7 +122,8 @@ export const useHomeService = () => {
     const result: GuessResult = {
       student: student,
       matches: {
-        rarity: student.rarity === targetStudent.rarity ? "CORRECT" : "WRONG",
+        rarity: getNumericComparison(targetStudent.rarity, student.rarity),
+
         academy:
           student.academy === targetStudent.academy ? "CORRECT" : "WRONG",
         type: student.type === targetStudent.type ? "CORRECT" : "WRONG",
