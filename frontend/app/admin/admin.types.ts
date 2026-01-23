@@ -1,10 +1,10 @@
 import {
-  Control,
-  FieldErrors,
   UseFormRegister,
   UseFormHandleSubmit,
+  FieldErrors,
+  Control,
 } from "react-hook-form";
-import { CreateStudentDTO } from "@/types/student.types";
+import { CreateStudentDTO } from "./admin.schema";
 
 export interface AdminViewProps {
   register: UseFormRegister<CreateStudentDTO>;

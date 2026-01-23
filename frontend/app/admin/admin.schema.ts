@@ -7,9 +7,9 @@ import {
   StudentType,
 } from "@/types/student.types";
 
-export const studentSchema = z.object({
+const studentFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  rarity: z.coerce.number().min(1).max(3),
+  rarity: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   type: z.nativeEnum(StudentType),
   role: z.nativeEnum(Role),
   attackType: z.nativeEnum(AttackType),
@@ -22,7 +22,7 @@ export const studentSchema = z.object({
   birthday: z.string().min(1, "Birthday is required"),
   hobby: z.string().min(1, "Hobby is required"),
   club: z.string().min(1, "Club is required"),
-  ssrDescription: z.string().optional().default(""),
+  ssrDescription: z.string().default(""),
 
   haloImage: z.string().url("Must be a valid URL"),
   studentImage: z.string().url("Must be a valid URL"),
@@ -31,4 +31,6 @@ export const studentSchema = z.object({
   voiceline: z.string().url("Must be a valid URL"),
 });
 
-export type CreateStudentDTO = z.infer<typeof studentSchema>;
+export const studentSchema = studentFormSchema;
+
+export type CreateStudentDTO = z.infer<typeof studentFormSchema>;

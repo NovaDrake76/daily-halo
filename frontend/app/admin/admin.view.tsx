@@ -6,9 +6,9 @@ import {
   DefenseType,
   Role,
   StudentType,
-  CreateStudentDTO,
   IStudent,
 } from "@/types/student.types";
+import { CreateStudentDTO } from "./admin.schema";
 import { getAcademyLogo } from "@/utils/assets.utils";
 
 const ASSET_FIELDS: (keyof CreateStudentDTO)[] = [

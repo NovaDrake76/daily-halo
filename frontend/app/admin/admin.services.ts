@@ -1,12 +1,12 @@
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form"; // Added Resolver import
 import { zodResolver } from "@hookform/resolvers/zod";
-import { studentSchema } from "./admin.schema";
+import { studentSchema, CreateStudentDTO } from "./admin.schema";
 import {
   useCreateStudentMutation,
   useAdminStudentsList,
   useUpdateStudentMutation,
 } from "./admin.hooks";
-import { CreateStudentDTO, IStudent } from "@/types/student.types";
+import { IStudent } from "@/types/student.types";
 import { AdminViewProps } from "./admin.types";
 
 interface ExtendedAdminViewProps extends AdminViewProps {
@@ -26,7 +26,9 @@ export const useAdminService = (): ExtendedAdminViewProps => {
     reset,
     formState: { errors },
   } = useForm<CreateStudentDTO>({
-    resolver: zodResolver(studentSchema),
+    resolver: zodResolver(
+      studentSchema,
+    ) as unknown as Resolver<CreateStudentDTO>,
     defaultValues: {
       rarity: 1,
     },
