@@ -9,6 +9,7 @@ import {
   CreateStudentDTO,
   IStudent,
 } from "@/types/student.types";
+import { getAcademyLogo } from "@/utils/assets.utils";
 
 const ASSET_FIELDS: (keyof CreateStudentDTO)[] = [
   "studentImage",
@@ -53,9 +54,16 @@ const StudentRow = ({
         </div>
       </td>
       <td className="p-4">
-        <span className="text-xs font-bold text-[#8EB0CD] uppercase bg-white border border-[#DCE5EA] px-2 py-1 rounded">
-          {student.academy}
-        </span>
+        <div className="flex items-center gap-2 bg-white border border-[#DCE5EA] px-2 py-1 rounded w-fit">
+          <img
+            src={getAcademyLogo(student.academy)}
+            alt={student.academy}
+            className="w-5 h-5 object-contain"
+          />
+          <span className="text-xs font-bold text-[#8EB0CD] uppercase">
+            {student.academy}
+          </span>
+        </div>
       </td>
       <td className="p-4">
         {isEditing ? (
@@ -69,37 +77,13 @@ const StudentRow = ({
               onClick={handleSave}
               className="bg-[#00C58E] text-white p-1 rounded hover:bg-[#00A376]"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                ></path>
-              </svg>
+              ✓
             </button>
             <button
               onClick={() => setIsEditing(false)}
               className="bg-[#FF4D4F] text-white p-1 rounded hover:bg-[#D9363E]"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
+              ✕
             </button>
           </div>
         ) : (
@@ -107,6 +91,7 @@ const StudentRow = ({
             <div className="w-8 h-8 rounded bg-[#002E5D] p-1 flex items-center justify-center">
               <img
                 src={student.haloImage}
+                alt="Halo"
                 className="w-full h-full object-contain filter brightness-200"
               />
             </div>
@@ -114,7 +99,7 @@ const StudentRow = ({
               onClick={() => setIsEditing(true)}
               className="text-[#1289F1] text-xs font-bold hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              EDIT HALO
+              EDIT
             </button>
           </div>
         )}
@@ -153,7 +138,7 @@ export const AdminView: React.FC<ExtendedAdminViewProps> = ({
         >
           <div className="space-y-6">
             <h2 className="text-[#1289F1] font-bold text-sm uppercase tracking-wider border-b border-[#E0E0E0] pb-2">
-              01. Basic Information
+              01. Basic Identity
             </h2>
 
             <div className="space-y-2">
@@ -185,11 +170,6 @@ export const AdminView: React.FC<ExtendedAdminViewProps> = ({
                   <option value="2">★★ 2</option>
                   <option value="3">★★★ 3</option>
                 </select>
-                {errors.rarity && (
-                  <span className="text-red-500 text-xs font-bold">
-                    {errors.rarity.message}
-                  </span>
-                )}
               </div>
 
               <div className="space-y-2">
@@ -207,6 +187,120 @@ export const AdminView: React.FC<ExtendedAdminViewProps> = ({
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  School Year
+                </label>
+                <input
+                  {...register("schoolYear")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. 2nd Year"
+                />
+                {errors.schoolYear && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.schoolYear.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  Age
+                </label>
+                <input
+                  {...register("age")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. 16 years old"
+                />
+                {errors.age && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.age.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  Height (cm)
+                </label>
+                <input
+                  type="number"
+                  {...register("height")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. 156"
+                />
+                {errors.height && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.height.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  Birthday
+                </label>
+                <input
+                  {...register("birthday")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. January 16"
+                />
+                {errors.birthday && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.birthday.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  Club
+                </label>
+                <input
+                  {...register("club")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. Countermeasure Council"
+                />
+                {errors.club && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.club.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                  Hobby
+                </label>
+                <input
+                  {...register("hobby")}
+                  className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none"
+                  placeholder="e.g. Cycling"
+                />
+                {errors.hobby && (
+                  <span className="text-red-500 text-xs font-bold">
+                    {errors.hobby.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#4B5E6D] uppercase">
+                SSR Description (Flavor Text)
+              </label>
+              <textarea
+                {...register("ssrDescription")}
+                className="w-full bg-[#F3F7F8] p-3 rounded font-bold text-[#002E5D] outline-none min-h-[80px]"
+                placeholder="Character introduction text..."
+              />
             </div>
           </div>
 
@@ -280,31 +374,31 @@ export const AdminView: React.FC<ExtendedAdminViewProps> = ({
                 </select>
               </div>
             </div>
-          </div>
 
-          <div className="col-span-1 md:col-span-2 space-y-4 p-6 bg-[#EAF6FF] rounded-lg border border-[#1289F1] relative mt-4">
-            <div className="absolute -top-3 left-4 bg-[#1289F1] text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded">
-              Asset Links
-            </div>
+            <div className="col-span-1 md:col-span-2 space-y-4 p-6 bg-[#EAF6FF] rounded-lg border border-[#1289F1] relative mt-4">
+              <div className="absolute -top-3 left-4 bg-[#1289F1] text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded">
+                Asset Links
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              {ASSET_FIELDS.map((field) => (
-                <div key={field} className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#1289F1] uppercase tracking-wider">
-                    {field.replace(/([A-Z])/g, " $1")} (URL)
-                  </label>
-                  <input
-                    {...register(field)}
-                    className="w-full bg-white border border-[#BFDFFF] p-2 text-sm rounded focus:outline-none focus:border-[#1289F1]"
-                    placeholder="https://..."
-                  />
-                  {errors[field] && (
-                    <span className="text-red-500 text-[10px] font-bold block">
-                      {errors[field]?.message}
-                    </span>
-                  )}
-                </div>
-              ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                {ASSET_FIELDS.map((field) => (
+                  <div key={field} className="space-y-1">
+                    <label className="text-[10px] font-bold text-[#1289F1] uppercase tracking-wider">
+                      {field.replace(/([A-Z])/g, " $1")} (URL)
+                    </label>
+                    <input
+                      {...register(field)}
+                      className="w-full bg-white border border-[#BFDFFF] p-2 text-sm rounded focus:outline-none focus:border-[#1289F1]"
+                      placeholder="https://..."
+                    />
+                    {errors[field] && (
+                      <span className="text-red-500 text-[10px] font-bold block">
+                        {errors[field]?.message}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
