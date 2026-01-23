@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useRandomStudent, useStudentSearch } from "./home.hooks";
+import {
+  useRandomStudent,
+  useStudentSearch,
+  useDailyWinCount,
+  useRegisterWin,
+} from "./home.hooks";
 import { IStudent } from "@/types/student.types";
 
 export type MatchStatus = "CORRECT" | "WRONG" | "HIGHER" | "LOWER" | "PARTIAL";
@@ -45,6 +50,8 @@ const getNumericComparison = (
 export const useHomeService = () => {
   const { data: targetStudent, isLoading: isLoadingTarget } =
     useRandomStudent();
+  const { mutate: registerWin } = useRegisterWin();
+  const { data: globalWinCount = 0 } = useDailyWinCount(targetStudent?.name);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -79,7 +86,7 @@ export const useHomeService = () => {
         }
       }
     } catch (error) {
-      console.error("Failed to load game state:", error);
+      console.error(error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetStudent]);
@@ -144,6 +151,9 @@ export const useHomeService = () => {
 
     if (student.name === targetStudent.name) {
       setHasWon(true);
+      if (!hasWon) {
+        registerWin(targetStudent.name);
+      }
     }
   };
 
@@ -160,5 +170,6 @@ export const useHomeService = () => {
     hasLost,
     isGameOver,
     maxGuesses: MAX_GUESSES,
+    globalWinCount,
   };
 };
