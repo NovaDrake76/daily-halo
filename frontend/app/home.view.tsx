@@ -162,11 +162,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       className="w-full text-left p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 flex items-center gap-4 transition-all border-b border-slate-100 last:border-0 group"
                     >
                       <div className="w-16 h-16 shrink-0 bg-slate-100 rounded-xl overflow-hidden ring-2 ring-slate-200 group-hover:ring-blue-500 transition-all">
-                        <img
-                          src={s.studentImage}
-                          alt={s.name}
-                          className="w-full h-full object-cover object-top"
-                        />
+                        <div className="w-40 overflow-hidden flex">
+                          <img
+                            src={s.studentImage}
+                            alt={s.name}
+                            className="h-full w-auto object-cover -ml-12 -mt-6"
+                          />
+                        </div>
                       </div>
                       <div className="flex-1">
                         <div className="font-bold text-slate-800 text-base mb-1">
@@ -256,12 +258,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
                 {/* Student Info */}
                 <div className="flex items-center gap-4 lg:w-64 shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-100 overflow-hidden ring-2 ring-slate-200">
-                    <img
-                      src={guess.student.studentImage}
-                      alt={guess.student.name}
-                      className="w-full h-full object-cover object-top"
-                    />
+                  <div className="w-24 h-24 rounded-2xl bg-slate-100 overflow-hidden ring-2 ring-slate-200">
+                    <div className="w-40 overflow-hidden flex">
+                      <img
+                        src={guess.student.studentImage}
+                        alt={guess.student.name}
+                        className="h-full w-auto object-cover -ml-12 -mt-2"
+                      />
+                    </div>
                   </div>
                   <div>
                     <p className="font-bold text-slate-800 text-lg mb-1">
