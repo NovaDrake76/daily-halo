@@ -43,19 +43,18 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="col-span-1">
                 <HintBox
-                  title="Unique Gear"
-                  image={targetStudent.itemImage}
+                  title="Halo Pattern"
+                  image={targetStudent.haloImage}
                   isLocked={attempts < 1}
                   lockLabel="Locked (1 Fail)"
                   delay={0}
                 />
               </div>
-
               <div
                 className={`
-                 col-span-1 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px]
-                 ${attempts >= 2 ? "bg-pink-50 border-pink-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
-              `}
+                  col-span-1 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px]
+                  ${attempts >= 2 ? "bg-pink-50 border-pink-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+               `}
               >
                 {attempts >= 2 ? (
                   <div className="text-center animate-in zoom-in w-full">
@@ -86,9 +85,9 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
               {showRow2 && (
                 <div
                   className={`
-                   col-span-2 md:col-span-4 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[100px] animate-in fade-in slide-in-from-top-2
-                   ${attempts >= 4 ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
-                `}
+                    col-span-2 md:col-span-4 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[100px] animate-in fade-in slide-in-from-top-2
+                    ${attempts >= 4 ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                 `}
                 >
                   {attempts >= 4 ? (
                     <div className="text-center animate-in zoom-in">
@@ -114,8 +113,8 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                     style={{ animationDelay: "100ms" }}
                   >
                     <HintBox
-                      title="Halo Pattern"
-                      image={targetStudent.haloImage}
+                      title="Unique Gear"
+                      image={targetStudent.itemImage}
                       isLocked={attempts < 5}
                       lockLabel="Locked (5 Fails)"
                       delay={200}
@@ -124,35 +123,12 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
 
                   <div
                     className={`
-                     col-span-1 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
-                     ${attempts >= 6 ? "bg-purple-50 border-purple-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
-                  `}
+                      col-span-1 md:col-span-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
+                      ${attempts >= 6 ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                   `}
                     style={{ animationDelay: "150ms" }}
                   >
                     {attempts >= 6 ? (
-                      <div className="text-center animate-in zoom-in w-full">
-                        <span className="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-1">
-                          Club
-                        </span>
-                        <p className="font-bold text-slate-700 text-sm md:text-base leading-tight">
-                          {targetStudent.club}
-                        </p>
-                      </div>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
-                        Locked (6 Fails)
-                      </span>
-                    )}
-                  </div>
-
-                  <div
-                    className={`
-                     col-span-2 md:col-span-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
-                     ${attempts >= 7 ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
-                  `}
-                    style={{ animationDelay: "200ms" }}
-                  >
-                    {attempts >= 7 ? (
                       <div className="flex flex-col items-center w-full animate-in zoom-in duration-300">
                         <span className="text-2xl mb-2">🔊</span>
                         <audio
@@ -170,9 +146,32 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                           🔇
                         </div>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Locked (7 Fails)
+                          Locked (6 Fails)
                         </span>
                       </div>
+                    )}
+                  </div>
+
+                  <div
+                    className={`
+                      col-span-2 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
+                      ${attempts >= 7 ? "bg-purple-50 border-purple-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                   `}
+                    style={{ animationDelay: "200ms" }}
+                  >
+                    {attempts >= 7 ? (
+                      <div className="text-center animate-in zoom-in w-full">
+                        <span className="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-1">
+                          Club
+                        </span>
+                        <p className="font-bold text-slate-700 text-sm md:text-base leading-tight">
+                          {targetStudent.club}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
+                        Locked (7 Fails)
+                      </span>
                     )}
                   </div>
                 </>

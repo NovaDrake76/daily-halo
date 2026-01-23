@@ -71,14 +71,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   <div className="font-bold text-slate-800 text-base mb-1">
                     {s.name}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
+                    <div className="flex  items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                       <img
                         src={getAcademyLogo(s.academy)}
                         alt={s.academy}
                         className="w-4 h-4 object-contain"
                       />
-                      <span className="text-xs text-slate-500 font-bold uppercase">
+                      <span className="text-xs text-slate-500 font-bold uppercase text-center">
                         {s.academy}
                       </span>
                     </div>
