@@ -25,6 +25,11 @@ export const Header: React.FC<HeaderProps> = ({ isGameOver, guessesLeft }) => {
         <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-400 to-transparent drop-shadow-sm"></div>
       </div>
       {!isGameOver && (
+        <p className="text-slate-600 mt-6 font-medium text-lg">
+          Guess the random student of the day!
+        </p>
+      )}
+      {!isGameOver && (
         <p className="text-slate-500 font-bold mt-2 text-sm">
           Attempts Remaining:{" "}
           <span className={guessesLeft <= 3 ? "text-red-500" : "text-blue-500"}>

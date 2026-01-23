@@ -34,10 +34,39 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
     textColor = "text-amber-900";
   }
 
+  const getTooltip = () => {
+    const l = label.toLowerCase();
+
+    if (status === "CORRECT") {
+      return `Correct! This matches the student's ${l}.`;
+    }
+
+    if (status === "WRONG") {
+      return `Incorrect. This is not the student's ${l}.`;
+    }
+
+    if (status === "HIGHER") {
+      if (l === "age") return "The correct student is Older ↑";
+      if (l === "height") return "The correct student is Taller ↑";
+      if (l === "year") return "The correct student is in a Higher Grade ↑";
+      return "The correct value is Higher ↑";
+    }
+
+    if (status === "LOWER") {
+      if (l === "age") return "The correct student is Younger ↓";
+      if (l === "height") return "The correct student is Shorter ↓";
+      if (l === "year") return "The correct student is in a Lower Grade ↓";
+      return "The correct value is Lower ↓";
+    }
+
+    return "";
+  };
+
   return (
     <div
+      title={getTooltip()}
       className={`
-      flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all duration-500 transform hover:scale-105 relative overflow-hidden h-full min-h-[70px]
+      flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all duration-500 transform hover:scale-105 relative overflow-hidden h-full min-h-[70px] cursor-help
       ${bgColor} ${borderColor} ${textColor}
     `}
       style={{ animationDelay: `${delay}ms` }}

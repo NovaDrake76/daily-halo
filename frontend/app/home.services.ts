@@ -20,6 +20,7 @@ export interface GuessResult {
 }
 
 const MAX_GUESSES = 10;
+const STORAGE_KEY = "daily_halo_game_state";
 
 const parseAge = (ageStr: string): number => {
   const match = ageStr.match(/(\d+)/);
@@ -60,6 +61,42 @@ export const useHomeService = () => {
 
   const [guesses, setGuesses] = useState<GuessResult[]>([]);
   const [hasWon, setHasWon] = useState(false);
+
+  useEffect(() => {
+    if (!targetStudent || guesses.length > 0) return;
+
+    try {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
+        const { studentName, storedGuesses, storedHasWon } =
+          JSON.parse(savedData);
+
+        if (studentName === targetStudent.name) {
+          setGuesses(storedGuesses);
+          setHasWon(storedHasWon);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load game state:", error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetStudent]);
+
+  useEffect(() => {
+    if (!targetStudent) return;
+
+    if (guesses.length > 0 || hasWon) {
+      const stateToSave = {
+        studentName: targetStudent.name,
+        storedGuesses: guesses,
+        storedHasWon: hasWon,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    }
+  }, [guesses, hasWon, targetStudent]);
 
   const hasLost = guesses.length >= MAX_GUESSES && !hasWon;
   const isGameOver = hasWon || hasLost;
