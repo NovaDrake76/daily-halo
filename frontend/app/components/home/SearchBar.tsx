@@ -63,7 +63,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     <img
                       src={s.studentImage}
                       alt={s.name}
-                      className="h-full w-auto object-cover -ml-12 -mt-6"
+                      className="h-full w-auto object-cover object-top scale-125 -ml-6"
                     />
                   </div>
                 </div>
