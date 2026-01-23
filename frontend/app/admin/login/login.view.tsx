@@ -9,7 +9,24 @@ export const LoginView: React.FC<LoginProps> = ({
   handleLogin,
   isLoading,
   error,
+  isBlocked,
 }) => {
+  if (isBlocked) {
+    return (
+      <div className="min-h-screen bg-[#1a0505] flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-[500px] bg-[#2a0808] rounded-xl shadow-[0_0_50px_rgba(255,0,0,0.2)] border-4 border-red-600 p-8 text-center animate-in zoom-in duration-300">
+          <div className="mb-6 text-6xl">🚫</div>
+          <h1 className="text-3xl font-black text-red-500 italic uppercase tracking-widest mb-2">
+            System Lockout
+          </h1>
+          <p className="text-red-300 font-bold uppercase tracking-wider text-xs border-y border-red-900 py-2 mb-6">
+            Unauthorized Access Detected
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#002E5D] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[500px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-[#1289F1]">
