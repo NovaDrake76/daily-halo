@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AdminViewProps } from "./admin.types";
 import {
   Academy,
@@ -7,6 +7,7 @@ import {
   Role,
   StudentType,
   CreateStudentDTO,
+  IStudent,
 } from "@/types/student.types";
 
 const ASSET_FIELDS: (keyof CreateStudentDTO)[] = [
@@ -17,15 +18,122 @@ const ASSET_FIELDS: (keyof CreateStudentDTO)[] = [
   "voiceline",
 ];
 
-export const AdminView: React.FC<AdminViewProps> = ({
+interface ExtendedAdminViewProps extends AdminViewProps {
+  studentsList: IStudent[];
+  onUpdateHalo: (id: string, url: string) => void;
+}
+
+const StudentRow = ({
+  student,
+  onUpdate,
+}: {
+  student: IStudent;
+  onUpdate: (id: string, url: string) => void;
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [haloUrl, setHaloUrl] = useState(student.haloImage);
+
+  const handleSave = () => {
+    onUpdate(student._id || "", haloUrl);
+    setIsEditing(false);
+  };
+
+  return (
+    <tr className="border-b border-[#DCE5EA] hover:bg-[#F3F7F8]">
+      <td className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-[#DCE5EA]">
+            <img
+              src={student.studentImage}
+              alt={student.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className="font-bold text-[#002E5D]">{student.name}</span>
+        </div>
+      </td>
+      <td className="p-4">
+        <span className="text-xs font-bold text-[#8EB0CD] uppercase bg-white border border-[#DCE5EA] px-2 py-1 rounded">
+          {student.academy}
+        </span>
+      </td>
+      <td className="p-4">
+        {isEditing ? (
+          <div className="flex items-center gap-2">
+            <input
+              value={haloUrl}
+              onChange={(e) => setHaloUrl(e.target.value)}
+              className="border border-[#1289F1] rounded px-2 py-1 text-xs w-full"
+            />
+            <button
+              onClick={handleSave}
+              className="bg-[#00C58E] text-white p-1 rounded hover:bg-[#00A376]"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-[#FF4D4F] text-white p-1 rounded hover:bg-[#D9363E]"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 group">
+            <div className="w-8 h-8 rounded bg-[#002E5D] p-1 flex items-center justify-center">
+              <img
+                src={student.haloImage}
+                className="w-full h-full object-contain filter brightness-200"
+              />
+            </div>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-[#1289F1] text-xs font-bold hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              EDIT HALO
+            </button>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+};
+
+export const AdminView: React.FC<ExtendedAdminViewProps> = ({
   register,
   handleSubmit,
   errors,
   onSubmit,
   isLoading,
+  studentsList,
+  onUpdateHalo,
 }) => {
   return (
-    <div className="min-h-screen bg-[#F3F7F8] p-8 font-sans text-slate-800 flex justify-center">
+    <div className="min-h-screen bg-[#F3F7F8] p-8 font-sans text-slate-800 flex flex-col items-center gap-8">
       <div className="w-full max-w-4xl bg-white rounded-md shadow-[0_4px_0_0_#DCE5EA] border border-[#DCE5EA] overflow-hidden">
         <div className="bg-[#002E5D] p-5 flex items-center gap-4 border-b-4 border-[#1289F1]">
           <div className="w-2 h-8 bg-[#1289F1]" />
@@ -210,6 +318,41 @@ export const AdminView: React.FC<AdminViewProps> = ({
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="w-full max-w-4xl bg-white rounded-md shadow-[0_4px_0_0_#DCE5EA] border border-[#DCE5EA] overflow-hidden">
+        <div className="bg-[#F3F7F8] p-4 border-b border-[#DCE5EA] flex justify-between items-center">
+          <h2 className="text-[#002E5D] font-black uppercase italic tracking-wider">
+            Database Records ({studentsList?.length || 0})
+          </h2>
+        </div>
+
+        <div className="max-h-[500px] overflow-y-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-[#EAF6FF] sticky top-0">
+              <tr>
+                <th className="p-4 text-xs font-bold text-[#1289F1] uppercase">
+                  Student
+                </th>
+                <th className="p-4 text-xs font-bold text-[#1289F1] uppercase">
+                  Academy
+                </th>
+                <th className="p-4 text-xs font-bold text-[#1289F1] uppercase">
+                  Halo Asset (URL)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {studentsList?.map((student) => (
+                <StudentRow
+                  key={student._id}
+                  student={student}
+                  onUpdate={onUpdateHalo}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

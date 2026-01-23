@@ -1,12 +1,23 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { studentSchema } from "./admin.schema";
-import { useCreateStudentMutation } from "./admin.hooks";
-import { CreateStudentDTO } from "@/types/student.types";
+import {
+  useCreateStudentMutation,
+  useAdminStudentsList,
+  useUpdateStudentMutation,
+} from "./admin.hooks";
+import { CreateStudentDTO, IStudent } from "@/types/student.types";
 import { AdminViewProps } from "./admin.types";
 
-export const useAdminService = (): AdminViewProps => {
+interface ExtendedAdminViewProps extends AdminViewProps {
+  studentsList: IStudent[];
+  onUpdateHalo: (id: string, url: string) => void;
+}
+
+export const useAdminService = (): ExtendedAdminViewProps => {
   const { mutate, isPending, isSuccess } = useCreateStudentMutation();
+  const { data: studentsList = [] } = useAdminStudentsList();
+  const { mutate: updateStudent } = useUpdateStudentMutation();
 
   const {
     register,
@@ -34,6 +45,10 @@ export const useAdminService = (): AdminViewProps => {
     });
   };
 
+  const onUpdateHalo = (id: string, url: string) => {
+    updateStudent({ id, data: { haloImage: url } });
+  };
+
   return {
     register,
     handleSubmit,
@@ -42,5 +57,7 @@ export const useAdminService = (): AdminViewProps => {
     onSubmit,
     isLoading: isPending,
     isSuccess,
+    studentsList,
+    onUpdateHalo,
   };
 };

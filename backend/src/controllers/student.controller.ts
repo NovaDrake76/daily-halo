@@ -48,4 +48,20 @@ export class StudentController {
       res.status(404).json({ error: error.message });
     }
   }
+
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const updatedStudent = await studentService.updateStudent(id, req.body);
+
+      if (!updatedStudent) {
+        res.status(404).json({ error: "Student not found" });
+        return;
+      }
+
+      res.status(200).json(updatedStudent);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

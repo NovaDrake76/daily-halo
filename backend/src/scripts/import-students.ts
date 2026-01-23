@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import axios from "axios";
+import crypto from "crypto"; // NEW: Needed for MD5 hashing
 import StudentModel from "../models/student.model";
 import {
   Academy,
@@ -14,7 +15,7 @@ import {
 
 dotenv.config();
 
-// --- MAPPINGS ---
+// --- MAPPINGS (Same as before) ---
 const SQUAD_TYPE_MAP: Record<string, StudentType> = {
   Main: StudentType.STRIKER,
   Support: StudentType.SPECIAL,
@@ -67,11 +68,28 @@ const formatAcademy = (school: string): Academy => {
 // --- URL CHECKER ---
 const checkUrlExists = async (url: string): Promise<boolean> => {
   try {
-    await axios.head(url, { timeout: 5000 }); // Increased timeout slightly
+    await axios.head(url, { timeout: 5000 });
     return true;
   } catch (error) {
     return false;
   }
+};
+
+// --- NEW: HALO URL GENERATOR ---
+const generateHaloUrl = (name: string): string => {
+  // 1. Format filename: "Aru" -> "Aru_Halo.png"
+  // Spaces must be underscores: "Red Winter" -> "Red_Winter_Halo.png"
+  const filename = `${name.replace(/ /g, "_")}_Halo.png`;
+
+  // 2. Calculate MD5 Hash of the filename
+  const hash = crypto.createHash("md5").update(filename).digest("hex");
+
+  // 3. Extract path parts
+  const a = hash.substring(0, 1);
+  const b = hash.substring(0, 2);
+
+  // 4. Construct MediaWiki URL
+  return `https://static.wikia.nocookie.net/blue-archive/images/${a}/${b}/${filename}`;
 };
 
 const importStudents = async () => {
@@ -97,15 +115,14 @@ const importStudents = async () => {
     let successCount = 0;
     let skippedCount = 0;
     let fallbackUsedCount = 0;
+    let haloFoundCount = 0;
 
     for (const s of students) {
-      // 1. FILTER: Skip Unreleased
       if (!s.IsReleased || !s.IsReleased[0]) {
         skippedCount++;
         continue;
       }
 
-      // 2. FILTER: Skip Variations (Parentheses check)
       if (s.Name.includes("(")) {
         skippedCount++;
         continue;
@@ -114,45 +131,44 @@ const importStudents = async () => {
       try {
         const studentId = s.Id;
         const pathName = s.PathName;
-        const devName = s.DevName ? s.DevName.toLowerCase() : ""; // "CH0109" -> "ch0109"
+        const devName = s.DevName ? s.DevName.toLowerCase() : "";
 
-        // Static Images (usually reliable)
+        // Standard Images
         const studentImage = `https://schaledb.com/images/student/portrait/${studentId}.webp`;
         const gunImage = `https://schaledb.com/images/weapon/weapon_icon_${studentId}.webp`;
         const itemImage = `https://schaledb.com/images/gear/full/${studentId}.webp`;
-        const haloImage = `https://schaledb.com/images/student/icon/${studentId}.webp`;
 
-        // 3. AUDIO VERIFICATION & FALLBACK
-        // Strategy A: Try PathName (e.g. "niya")
+        // --- HALO LOGIC ---
+        // 1. Default to icon (Safe fallback)
+        let haloImage = `https://schaledb.com/images/student/icon/${studentId}.webp`;
+
+        // 2. Try to generate Wiki URL
+        const wikiHaloUrl = generateHaloUrl(s.Name);
+        const isHaloValid = await checkUrlExists(wikiHaloUrl);
+
+        if (isHaloValid) {
+          haloImage = wikiHaloUrl;
+          haloFoundCount++;
+        } else {
+          // console.log(`   ⚠️ Halo not found on Wiki for ${s.Name}, using icon.`);
+        }
+
+        // --- AUDIO LOGIC ---
         let voiceline = `https://r2.schaledb.com/voice/jp_${pathName}/${pathName}_title.mp3`;
         let isVoiceValid = await checkUrlExists(voiceline);
 
-        // Strategy B: Try DevName (e.g. "ch0109") if Strategy A fails
         if (!isVoiceValid && devName) {
           const fallbackVoice = `https://r2.schaledb.com/voice/jp_${devName}/${devName}_title.mp3`;
-          // Check if this fallback actually works
           if (await checkUrlExists(fallbackVoice)) {
             voiceline = fallbackVoice;
             isVoiceValid = true;
             fallbackUsedCount++;
-            // console.log(`   ↳ Fixed voice for ${s.Name} using DevName: ${devName}`);
           }
         }
 
-        // Final Check: If still invalid, provide a placeholder to pass Mongoose validation
-        // (Use a generic sound or the main menu theme if you want,
-        // here I use a dummy URL that looks valid but won't play)
         if (!isVoiceValid) {
-          console.warn(
-            `⚠️  Voice MISSING for ${s.Name}. Path: ${pathName}, Dev: ${devName}`,
-          );
-          // Placeholder to satisfy "required" if necessary, or let it fail if you prefer strictness
-          // voiceline = 'https://schaledb.com/audio/not_found.mp3';
-
-          // If Mongoose requires it, we MUST provide a string.
-          // If we leave it empty string, Mongoose might complain depending on schema options.
-          // Let's assume we skip students with absolutely no voice to avoid game errors:
-          // throw new Error('No valid voice line found.');
+          console.warn(`⚠️  Voice MISSING for ${s.Name}`);
+          // voiceline = ''; // Optional: clear it if you want strictness
         }
 
         const studentDoc = {
@@ -179,14 +195,14 @@ const importStudents = async () => {
         successCount++;
         process.stdout.write("•");
       } catch (err: any) {
-        // If validation fails (e.g. missing voiceline), we catch it here
         console.error(`\n❌ Error processing ${s.Name}:`, err.message);
       }
     }
 
     console.log(`\n\n🎉 Import Complete!`);
-    console.log(`✅ Added/Updated: ${successCount}`);
-    console.log(`🔧 Fallback Repaired: ${fallbackUsedCount}`);
+    console.log(`✅ Total Processed: ${successCount}`);
+    console.log(`😇 Halos Found: ${haloFoundCount}`);
+    console.log(`🔧 Voices Repaired: ${fallbackUsedCount}`);
     console.log(`⏭️  Skipped: ${skippedCount}`);
   } catch (error) {
     console.error("Fatal Error:", error);

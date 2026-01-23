@@ -1,7 +1,7 @@
 import React from "react";
 import { GuessResult } from "./home.services";
 import { IStudent } from "@/types/student.types";
-
+import { getAcademyLogo } from "@/utils/assets.utils";
 interface HomeViewProps {
   targetStudent?: IStudent;
   isLoading: boolean;
@@ -27,7 +27,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const attempts = guesses.length;
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-no-repeat bg-fixed font-sans">
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat bg-fixed font-sans">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         <header className="text-center mb-12">
           <div className="inline-block relative">
@@ -173,9 +173,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           {s.name}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500 font-medium">
-                            {s.academy}
-                          </span>
+                          <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                            <img
+                              src={getAcademyLogo(s.academy)}
+                              alt={s.academy}
+                              className="w-4 h-4 object-contain"
+                            />
+                            <span className="text-xs text-slate-500 font-bold uppercase">
+                              {s.academy}
+                            </span>
+                          </div>
                           <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded">
                             {s.type}
                           </span>
@@ -202,7 +209,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="relative">
               <h2 className="text-5xl font-black text-white uppercase tracking-wider mb-8 drop-shadow-lg">
-                🎉 Mission Complete
+                🎉 Yes, it&apos;s {targetStudent.name}!
               </h2>
 
               <div className="flex flex-col items-center">
@@ -213,6 +220,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     alt="Winner"
                     className="relative w-40 h-40 rounded-full ring-8 ring-white shadow-2xl object-cover"
                   />
+                  <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-blue-500/20">
+                    <img
+                      src={getAcademyLogo(targetStudent.academy)}
+                      alt={targetStudent.academy}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 </div>
 
                 <p className="text-4xl font-black text-white mb-2 drop-shadow-md">
@@ -272,6 +286,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     value={guess.student.academy}
                     isCorrect={guess.matches.academy}
                     delay={idx * 50}
+                    icon={getAcademyLogo(guess.student.academy)}
                   />
                   <AttributeBox
                     label="Role"
@@ -318,15 +333,17 @@ const AttributeBox = ({
   value,
   isCorrect,
   delay,
+  icon,
 }: {
   label: string;
   value: string;
   isCorrect: boolean;
   delay: number;
+  icon?: string;
 }) => (
   <div
     className={`
-      flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-500 transform hover:scale-105
+      flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-500 transform hover:scale-105 relative overflow-hidden
       ${
         isCorrect
           ? "bg-gradient-to-br from-emerald-50 to-teal-50 ring-2 ring-emerald-400 text-emerald-900 shadow-lg shadow-emerald-100"
@@ -335,11 +352,27 @@ const AttributeBox = ({
     `}
     style={{ animationDelay: `${delay}ms` }}
   >
-    <span className="text-xs font-bold uppercase opacity-60 mb-1.5 tracking-wider">
+    {icon && (
+      <div className="absolute opacity-5 w-full h-full flex items-center justify-center pointer-events-none grayscale scale-150">
+        <img src={icon} className="w-full h-full object-contain" />
+      </div>
+    )}
+
+    <span className="text-xs font-bold uppercase opacity-60 mb-1.5 tracking-wider z-10">
       {label}
     </span>
-    <span className="text-sm font-black uppercase text-center leading-tight">
-      {value}
-    </span>
+
+    <div className="flex flex-col items-center z-10">
+      {icon && (
+        <img
+          src={icon}
+          alt=""
+          className="w-6 h-6 object-contain mb-1 drop-shadow-sm"
+        />
+      )}
+      <span className="text-sm font-black uppercase text-center leading-tight">
+        {value}
+      </span>
+    </div>
   </div>
 );

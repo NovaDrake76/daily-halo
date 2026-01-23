@@ -49,4 +49,11 @@ export class StudentService {
 
     return student;
   }
+
+  async updateStudent(
+    id: string,
+    data: Partial<CreateStudentDTO>,
+  ): Promise<StudentDocument | null> {
+    return await StudentModel.findByIdAndUpdate(id, data, { new: true });
+  }
 }
