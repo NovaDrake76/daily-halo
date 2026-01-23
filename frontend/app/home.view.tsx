@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { GuessResult } from "./home.services";
 import { IStudent } from "@/types/student.types";
 import { getAcademyLogo } from "@/utils/assets.utils";
+
 interface HomeViewProps {
   targetStudent?: IStudent;
   isLoading: boolean;
@@ -12,6 +13,9 @@ interface HomeViewProps {
   handleGuess: (student: IStudent) => void;
   guesses: GuessResult[];
   hasWon: boolean;
+  hasLost: boolean;
+  isGameOver: boolean;
+  maxGuesses: number;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -22,14 +26,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
   handleGuess,
   guesses,
   hasWon,
+  hasLost,
+  isGameOver,
   targetStudent,
+  maxGuesses,
 }) => {
   const attempts = guesses.length;
+  const guessesLeft = maxGuesses - attempts;
 
   return (
     <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat bg-fixed font-sans">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        <header className="text-center mb-12">
+        <header className="text-center mb-8">
           <div className="inline-block relative">
             <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-20 scale-150"></div>
             <h1 className="relative text-6xl md:text-7xl text-[#0a8bfa] tracking-tight mb-3 italic font-bold drop-shadow-[0_2px_8px_rgba(10,139,250,0.5)] shadow-black">
@@ -46,6 +54,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </p>
             <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-400 to-transparent drop-shadow-sm"></div>
           </div>
+          {!isGameOver && (
+            <p className="text-slate-500 font-bold mt-2 text-sm">
+              Attempts Remaining:{" "}
+              <span
+                className={guessesLeft <= 3 ? "text-red-500" : "text-blue-500"}
+              >
+                {guessesLeft}
+              </span>
+            </p>
+          )}
         </header>
 
         {isLoading && (
@@ -59,13 +77,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         )}
 
-        {!hasWon && !isLoading && targetStudent && attempts >= 3 && (
-          <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-blue-100 relative overflow-hidden">
+        {!isGameOver && !isLoading && targetStudent && attempts >= 1 && (
+          <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-700 fill-mode-forwards">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-xl border border-blue-100 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100 to-transparent opacity-30 rounded-full -mr-32 -mt-32"></div>
 
               <div className="relative">
-                <div className="flex items-center justify-center gap-3 mb-8">
+                <div className="flex items-center justify-center gap-3 mb-6">
                   <div className="w-12 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
                   <h3 className="text-sm font-black uppercase tracking-widest text-blue-600">
                     Arona&apos;s Hints
@@ -73,53 +91,68 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div className="w-12 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-                  <div className="flex flex-col items-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 shadow-lg flex items-center justify-center overflow-hidden transition-all hover:scale-105 hover:shadow-xl">
-                      <img
-                        src={targetStudent.haloImage}
-                        alt="Halo Hint"
-                        className="w-full h-full object-contain filter drop-shadow-lg"
-                      />
-                    </div>
-                    <span className="mt-3 text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-4 py-1.5 rounded-full">
-                      Halo Pattern
-                    </span>
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <HintBox
+                    title="Unique Gear"
+                    image={targetStudent.itemImage}
+                    isLocked={attempts < 1}
+                    lockLabel="Locked (1st Try)"
+                    delay={0}
+                  />
 
-                  {attempts >= 4 ? (
-                    <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-lg border border-blue-100">
+                  <HintBox
+                    title="Weapon"
+                    image={targetStudent.gunImage}
+                    isLocked={attempts < 2}
+                    lockLabel="Locked (2nd Try)"
+                    delay={100}
+                  />
+
+                  <HintBox
+                    title="Halo Pattern"
+                    image={targetStudent.haloImage}
+                    isLocked={attempts < 3}
+                    lockLabel="Locked (3rd Try)"
+                    delay={200}
+                  />
+
+                  <div
+                    className={`
+                     flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 h-40
+                     ${attempts >= 4 ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                  `}
+                  >
+                    {attempts >= 4 ? (
+                      <div className="flex flex-col items-center w-full animate-in zoom-in duration-300">
+                        <span className="text-2xl mb-2">🔊</span>
                         <audio
                           controls
                           src={targetStudent.voiceline}
-                          className="w-64 h-10"
+                          className="w-full h-8 mb-2 max-w-[150px]"
                         />
-                      </div>
-                      <span className="mt-3 text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-4 py-1.5 rounded-full">
-                        Audio Log
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center opacity-40">
-                      <div className="w-64 h-32 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center">
-                        <span className="text-sm font-bold text-slate-400">
-                          🔒 LOCKED (4th Try)
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-white px-2 py-1 rounded-full">
+                          Audio Log
                         </span>
                       </div>
-                      <span className="mt-3 text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        ???
-                      </span>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-center">
+                        <div className="text-2xl mb-2 grayscale opacity-50">
+                          🔇
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Locked (4th Try)
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {!hasWon && !isLoading && (
-          <div className="relative mb-8 max-w-2xl mx-auto">
+        {!isGameOver && !isLoading && (
+          <div className="relative mb-8 max-w-2xl mx-auto animate-in fade-in duration-500">
             <div
               className={`relative flex items-center bg-white rounded-2xl shadow-lg transition-all duration-300 ${
                 searchTerm
@@ -146,7 +179,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Type student name..."
+                placeholder="Search student name..."
                 className="w-full p-5 bg-transparent outline-none font-semibold text-slate-700 placeholder:text-slate-400"
                 autoFocus
               />
@@ -161,12 +194,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       onClick={() => handleGuess(s)}
                       className="w-full text-left p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 flex items-center gap-4 transition-all border-b border-slate-100 last:border-0 group"
                     >
-                      <div className="w-16 h-16 shrink-0 bg-slate-100 rounded-xl overflow-hidden ring-2 ring-slate-200 group-hover:ring-blue-500 transition-all">
+                      <div className="w-28 h-28 shrink-0 bg-slate-100 rounded-xl overflow-hidden ring-2 ring-slate-200 group-hover:ring-blue-500 transition-all">
                         <div className="w-40 overflow-hidden flex">
                           <img
                             src={s.studentImage}
                             alt={s.name}
-                            className="h-full w-auto object-cover -ml-12 -mt-6"
+                            className="h-full w-auto object-cover -ml-8 -mt-4"
                           />
                         </div>
                       </div>
@@ -185,9 +218,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
                               {s.academy}
                             </span>
                           </div>
-                          <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                            {s.type}
-                          </span>
                         </div>
                       </div>
                       <div className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 font-bold text-sm">
@@ -205,24 +235,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         )}
 
-        {hasWon && targetStudent && (
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl p-8 text-center shadow-2xl mb-8 animate-in zoom-in duration-500 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
+        {isGameOver && targetStudent && (
+          <div
+            className={`
+             rounded-3xl p-8 text-center shadow-2xl mb-8 animate-in zoom-in duration-500 relative overflow-hidden border-4
+             ${hasWon ? "bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400" : "bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600"}
+          `}
+          >
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
 
             <div className="relative">
-              <h2 className="text-5xl font-black text-white uppercase tracking-wider mb-8 drop-shadow-lg">
-                🎉 Yes, it&apos;s {targetStudent.name}!
+              <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-wider mb-2 drop-shadow-lg">
+                {hasWon
+                  ? `🎉 Yes! It's ${targetStudent.name}!`
+                  : "💔 You forgot about me, Sensei?"}
               </h2>
+              <p className="text-blue-200 text-sm font-bold uppercase tracking-widest mb-8">
+                {hasWon ? "Excellent work, Sensei!" : "Bro..."}
+              </p>
 
               <div className="flex flex-col items-center">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-white rounded-full blur-2xl opacity-40"></div>
+                  <div
+                    className={`absolute inset-0 rounded-full blur-2xl opacity-40 ${hasWon ? "bg-white" : "bg-red-500"}`}
+                  ></div>
                   <img
                     src={targetStudent.studentImage}
-                    alt="Winner"
-                    className="relative w-40 h-40 rounded-full ring-8 ring-white shadow-2xl object-cover"
+                    alt="Result"
+                    className={`relative w-40 h-40 rounded-full ring-8 shadow-2xl object-cover ${hasWon ? "ring-white" : "ring-slate-500 grayscale"}`}
                   />
-                  <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-blue-500/20">
+                  <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-black/10">
                     <img
                       src={getAcademyLogo(targetStudent.academy)}
                       alt={targetStudent.academy}
@@ -234,7 +276,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <p className="text-4xl font-black text-white mb-2 drop-shadow-md">
                   {targetStudent.name}
                 </p>
-                <p className="text-blue-100 font-semibold uppercase tracking-wider text-sm mb-6">
+                <p
+                  className={`font-semibold uppercase tracking-wider text-sm mb-6 ${hasWon ? "text-blue-100" : "text-slate-400"}`}
+                >
                   {targetStudent.academy}
                 </p>
 
@@ -243,6 +287,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   src={targetStudent.voiceline}
                   className="mt-4 opacity-90 hover:opacity-100 transition-opacity rounded-xl shadow-lg"
                 />
+
+                <div className="mt-8 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                  <p className="text-white font-bold text-sm">
+                    📅 Check in tomorrow to guess the next student!
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -252,18 +302,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {guesses.map((guess, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 animate-in fade-in slide-in-from-top-2 duration-300 hover:shadow-xl transition-shadow"
-              style={{ animationDelay: `${idx * 50}ms` }}
+              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 animate-in fade-in slide-in-from-top-4 duration-500 hover:shadow-xl transition-shadow"
+              style={{ animationDelay: `${idx * 100}ms` }}
             >
               <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
-                {/* Student Info */}
                 <div className="flex items-center gap-4 lg:w-64 shrink-0">
-                  <div className="w-24 h-24 rounded-2xl bg-slate-100 overflow-hidden ring-2 ring-slate-200">
-                    <div className="w-40 overflow-hidden flex">
+                  <div className="w-32 h-32 rounded-2xl bg-slate-100 overflow-hidden ring-2 ring-slate-200">
+                    <div className="w-32 overflow-hidden flex">
                       <img
                         src={guess.student.studentImage}
                         alt={guess.student.name}
-                        className="h-full w-auto object-cover -ml-12 -mt-2"
+                        className="h-full w-auto object-cover"
                       />
                     </div>
                   </div>
@@ -332,19 +381,80 @@ export const HomeView: React.FC<HomeViewProps> = ({
   );
 };
 
+interface HintBoxProps {
+  title: string;
+  image: string;
+  isLocked: boolean;
+  lockLabel: string;
+  delay: number;
+}
+
+const HintBox = ({
+  title,
+  image,
+  isLocked,
+  lockLabel,
+  delay,
+}: HintBoxProps) => {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <div
+      className={`
+      flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 h-40
+      ${isLocked ? "bg-slate-50 border-slate-200 border-dashed opacity-60" : "bg-white border-blue-100 shadow-lg scale-100"}
+  `}
+    >
+      {isLocked ? (
+        <div className="text-center">
+          <div className="text-2xl mb-2 grayscale opacity-50">🔒</div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            {lockLabel}
+          </span>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center animate-in zoom-in duration-300 w-full h-full justify-between">
+          <div className="flex-1 w-full flex items-center justify-center mb-2 overflow-hidden">
+            {image && !imgError ? (
+              <img
+                src={image}
+                alt={title}
+                className="w-full h-full object-contain max-h-[80px]"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <div className="text-2xl">❓</div>
+                <span className="text-xs text-slate-400">
+                  This student doesn&apos;t have one...
+                </span>
+              </div>
+            )}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+            {title}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface AttributeBoxProps {
+  label: string;
+  value: string;
+  isCorrect: boolean;
+  delay: number;
+  icon?: string;
+}
+
 const AttributeBox = ({
   label,
   value,
   isCorrect,
   delay,
   icon,
-}: {
-  label: string;
-  value: string;
-  isCorrect: boolean;
-  delay: number;
-  icon?: string;
-}) => (
+}: AttributeBoxProps) => (
   <div
     className={`
       flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-500 transform hover:scale-105 relative overflow-hidden
@@ -361,12 +471,10 @@ const AttributeBox = ({
         <img src={icon} className="w-full h-full object-contain" />
       </div>
     )}
-
     <span className="text-xs font-bold uppercase opacity-60 mb-1.5 tracking-wider z-10">
       {label}
     </span>
-
-    <div className="flex flex-col items-center z-10">
+    <div className="flex flex-col items-center z-10 w-full">
       {icon && (
         <img
           src={icon}
@@ -374,7 +482,7 @@ const AttributeBox = ({
           className="w-6 h-6 object-contain mb-1 drop-shadow-sm"
         />
       )}
-      <span className="text-sm font-black uppercase text-center leading-tight">
+      <span className="text-sm font-black uppercase text-center leading-tight truncate w-full px-1">
         {value}
       </span>
     </div>

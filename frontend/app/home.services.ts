@@ -14,6 +14,8 @@ export interface GuessResult {
   };
 }
 
+const MAX_GUESSES = 10;
+
 export const useHomeService = () => {
   const { data: targetStudent, isLoading: isLoadingTarget } =
     useRandomStudent();
@@ -35,8 +37,20 @@ export const useHomeService = () => {
   const [guesses, setGuesses] = useState<GuessResult[]>([]);
   const [hasWon, setHasWon] = useState(false);
 
+  const hasLost = guesses.length >= MAX_GUESSES && !hasWon;
+  const isGameOver = hasWon || hasLost;
+
   const handleGuess = (student: IStudent) => {
-    if (!targetStudent || hasWon) return;
+    if (!targetStudent || isGameOver) return;
+
+    const isAlreadyGuessed = guesses.some(
+      (g) => g.student.name === student.name,
+    );
+
+    if (isAlreadyGuessed) {
+      setSearchTerm("");
+      return;
+    }
 
     const result: GuessResult = {
       student: student,
@@ -70,5 +84,8 @@ export const useHomeService = () => {
     handleGuess,
     guesses,
     hasWon,
+    hasLost,
+    isGameOver,
+    maxGuesses: MAX_GUESSES,
   };
 };
