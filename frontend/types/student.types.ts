@@ -50,6 +50,15 @@ export interface IStudent {
   attackType: AttackType;
   defenseType: DefenseType;
   academy: Academy;
+
+  schoolYear: string;
+  age: string;
+  height: number;
+  birthday: string;
+  hobby: string;
+  club: string;
+  ssrDescription: string;
+
   haloImage: string;
   studentImage: string;
   gunImage: string;
@@ -57,4 +66,4 @@ export interface IStudent {
   voiceline: string;
 }
 
-export type CreateStudentDTO = Omit<IStudent, "_id">;
+export type CreateStudentDTO = IStudent;

@@ -9,81 +9,91 @@ interface GuessListProps {
 
 export const GuessList: React.FC<GuessListProps> = ({ guesses }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-6xl mx-auto">
       {guesses.map((guess, idx) => (
         <div
           key={idx}
-          className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 animate-in fade-in slide-in-from-top-2 duration-300 hover:shadow-xl transition-shadow"
+          className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 animate-in fade-in slide-in-from-top-2 duration-300"
           style={{ animationDelay: `${idx * 50}ms` }}
         >
-          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
-            {/* Student Info */}
-            <div className="flex items-center gap-4 lg:w-64 shrink-0">
-              <div className="w-24 h-24 rounded-2xl bg-slate-100 overflow-hidden ring-2 ring-slate-200">
-                <div className="w-40 overflow-hidden flex">
-                  <img
-                    src={guess.student.studentImage}
-                    alt={guess.student.name}
-                    className="h-full w-auto object-cover -ml-12 -mt-2"
-                  />
-                </div>
-              </div>
-              <div>
-                <p className="font-bold text-slate-800 text-lg mb-1">
-                  {guess.student.name}
-                </p>
-                <div className="flex gap-0.5">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={`text-base ${i < guess.student.rarity ? "text-amber-400" : "text-slate-200"}`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
+          <div className="flex items-center gap-4 mb-4 border-b border-slate-100 pb-3">
+            <div className="w-24 h-24 rounded-full bg-slate-100 overflow-hidden ring-2 ring-slate-200 shrink-0">
+              <div className="w-40 overflow-hidden flex">
+                <img
+                  src={guess.student.studentImage}
+                  alt={guess.student.name}
+                  className="h-full w-auto object-cover -ml-6 -mt-6"
+                />
               </div>
             </div>
+            <div>
+              <p className="font-black text-slate-800 text-lg leading-none">
+                {guess.student.name}
+              </p>
+              <div className="flex gap-0.5 mt-1">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`text-xs ${i < guess.student.rarity ? "text-amber-400" : "text-slate-200"}`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
 
-            <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 flex-1 w-full">
-              <AttributeBox
-                label="Academy"
-                value={guess.student.academy}
-                isCorrect={guess.matches.academy}
-                delay={idx * 50}
-                icon={getAcademyLogo(guess.student.academy)}
-              />
-              <AttributeBox
-                label="Role"
-                value={guess.student.role}
-                isCorrect={guess.matches.role}
-                delay={idx * 50 + 50}
-              />
-              <AttributeBox
-                label="Class"
-                value={guess.student.type}
-                isCorrect={guess.matches.type}
-                delay={idx * 50 + 100}
-              />
-              <AttributeBox
-                label="Attack"
-                value={guess.student.attackType}
-                isCorrect={guess.matches.attackType}
-                delay={idx * 50 + 150}
-              />
-              <AttributeBox
-                label="Defense"
-                value={guess.student.defenseType}
-                isCorrect={guess.matches.defenseType}
-                delay={idx * 50 + 200}
-              />
-              <AttributeBox
-                label="Rarity"
-                value={`${guess.student.rarity}★`}
-                isCorrect={guess.matches.rarity}
-                delay={idx * 50 + 250}
-              />
-            </div>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2">
+            <AttributeBox
+              label="Academy"
+              value={guess.student.academy}
+              status={guess.matches.academy}
+              delay={0}
+              icon={getAcademyLogo(guess.student.academy)}
+            />
+            <AttributeBox
+              label="Role"
+              value={guess.student.role}
+              status={guess.matches.role}
+              delay={50}
+            />
+            <AttributeBox
+              label="Class"
+              value={guess.student.type}
+              status={guess.matches.type}
+              delay={100}
+            />
+            <AttributeBox
+              label="Attack"
+              value={guess.student.attackType}
+              status={guess.matches.attackType}
+              delay={150}
+            />
+            <AttributeBox
+              label="Defense"
+              value={guess.student.defenseType}
+              status={guess.matches.defenseType}
+              delay={200}
+            />
+
+            <AttributeBox
+              label="Height"
+              value={`${guess.student.height}cm`}
+              status={guess.matches.height}
+              delay={250}
+            />
+            <AttributeBox
+              label="Age"
+              value={guess.student.age}
+              status={guess.matches.age}
+              delay={300}
+            />
+            <AttributeBox
+              label="Year"
+              value={guess.student.schoolYear}
+              status={guess.matches.schoolYear}
+              delay={350}
+            />
           </div>
         </div>
       ))}

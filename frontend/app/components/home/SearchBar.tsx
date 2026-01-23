@@ -58,7 +58,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 onClick={() => handleGuess(s)}
                 className="w-full text-left p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 flex items-center gap-4 transition-all border-b border-slate-100 last:border-0 group"
               >
-                <div className="w-16 h-16 shrink-0 bg-slate-100 rounded-xl overflow-hidden ring-2 ring-slate-200 group-hover:ring-blue-500 transition-all">
+                <div className="w-24 h-24 shrink-0 bg-slate-100 rounded-xl overflow-hidden ring-2 ring-slate-200 group-hover:ring-blue-500 transition-all">
                   <div className="w-40 overflow-hidden flex">
                     <img
                       src={s.studentImage}

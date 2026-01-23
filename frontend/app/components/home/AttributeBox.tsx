@@ -1,9 +1,10 @@
 import React from "react";
+import { MatchStatus } from "../../home.services";
 
 interface AttributeBoxProps {
   label: string;
-  value: string;
-  isCorrect: boolean;
+  value: string | number;
+  status: MatchStatus;
   delay: number;
   icon?: string;
 }
@@ -11,42 +12,58 @@ interface AttributeBoxProps {
 export const AttributeBox: React.FC<AttributeBoxProps> = ({
   label,
   value,
-  isCorrect,
+  status,
   delay,
   icon,
-}) => (
-  <div
-    className={`
-      flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-500 transform hover:scale-105 relative overflow-hidden
-      ${
-        isCorrect
-          ? "bg-gradient-to-br from-emerald-50 to-teal-50 ring-2 ring-emerald-400 text-emerald-900 shadow-lg shadow-emerald-100"
-          : "bg-gradient-to-br from-red-50 to-rose-50 ring-2 ring-red-400 text-red-900 shadow-lg shadow-red-100"
-      }
+}) => {
+  let bgColor = "bg-white";
+  let borderColor = "border-slate-200";
+  let textColor = "text-slate-800";
+
+  if (status === "CORRECT") {
+    bgColor = "bg-emerald-100";
+    borderColor = "border-emerald-400";
+    textColor = "text-emerald-900";
+  } else if (status === "WRONG") {
+    bgColor = "bg-red-100";
+    borderColor = "border-red-400";
+    textColor = "text-red-900";
+  } else if (status === "HIGHER" || status === "LOWER") {
+    bgColor = "bg-amber-100";
+    borderColor = "border-amber-400";
+    textColor = "text-amber-900";
+  }
+
+  return (
+    <div
+      className={`
+      flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all duration-500 transform hover:scale-105 relative overflow-hidden h-full min-h-[70px]
+      ${bgColor} ${borderColor} ${textColor}
     `}
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    {icon && (
-      <div className="absolute opacity-5 w-full h-full flex items-center justify-center pointer-events-none grayscale scale-150">
-        <img src={icon} className="w-full h-full object-contain" />
-      </div>
-    )}
-
-    <span className="text-xs font-bold uppercase opacity-60 mb-1.5 tracking-wider z-10">
-      {label}
-    </span>
-
-    <div className="flex flex-col items-center z-10 w-full">
+      style={{ animationDelay: `${delay}ms` }}
+    >
       {icon && (
-        <img
-          src={icon}
-          alt=""
-          className="w-6 h-6 object-contain mb-1 drop-shadow-sm"
-        />
+        <div className="absolute opacity-10 w-full h-full flex items-center justify-center pointer-events-none grayscale scale-150">
+          <img src={icon} className="w-full h-full object-contain" />
+        </div>
       )}
-      <span className="text-sm font-black uppercase text-center leading-tight truncate w-full px-1">
-        {value}
+
+      <span className="text-[10px] font-bold uppercase opacity-60 mb-1 tracking-wider z-10">
+        {label}
       </span>
+
+      <div className="flex items-center gap-1 z-10">
+        <span className="text-xs md:text-sm font-black uppercase text-center leading-tight truncate px-1">
+          {value}
+        </span>
+
+        {status === "HIGHER" && (
+          <span className="text-xl leading-none animate-bounce">↑</span>
+        )}
+        {status === "LOWER" && (
+          <span className="text-xl leading-none animate-bounce">↓</span>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};

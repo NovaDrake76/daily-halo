@@ -27,7 +27,7 @@ export const GameResult: React.FC<GameResultProps> = ({
             : "💔 You forgot about me, Sensei?"}
         </h2>
         <p className="text-blue-200 text-sm font-bold uppercase tracking-widest mb-8">
-          {hasWon ? "Excellent work, Sensei!" : "Don't give up, Sensei!"}
+          {hasWon ? "Excellent work, Sensei!" : "Bro..."}
         </p>
 
         <div className="flex flex-col items-center">
@@ -38,7 +38,7 @@ export const GameResult: React.FC<GameResultProps> = ({
             <img
               src={targetStudent.studentImage}
               alt="Result"
-              className={`relative w-40 h-40 rounded-full ring-8 shadow-2xl object-cover ${hasWon ? "ring-white" : "ring-slate-500 grayscale"}`}
+              className={`relative w-40 h-40 rounded-full ring-8 shadow-2xl object-cover object-top ${hasWon ? "ring-white" : "ring-slate-500 grayscale"}`}
             />
             <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-black/10">
               <img

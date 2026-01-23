@@ -49,6 +49,14 @@ export interface IStudent {
   attackType: AttackType;
   defenseType: DefenseType;
   academy: Academy;
+  schoolYear: string; // e.g. "2nd Year"
+  age: string; // e.g. "16 years old"
+  height: number; // e.g. 156 (cm)
+  birthday: string; // e.g. "01/02"
+  hobby: string;
+  club: string;
+  ssrDescription: string;
+
   haloImage: string;
   studentImage: string;
   gunImage: string;

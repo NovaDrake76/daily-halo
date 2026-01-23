@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import axios from "axios";
-import crypto from "crypto"; // NEW: Needed for MD5 hashing
+import crypto from "crypto";
 import StudentModel from "../models/student.model";
 import {
   Academy,
@@ -15,7 +15,7 @@ import {
 
 dotenv.config();
 
-// --- MAPPINGS (Same as before) ---
+// --- MAPPINGS ---
 const SQUAD_TYPE_MAP: Record<string, StudentType> = {
   Main: StudentType.STRIKER,
   Support: StudentType.SPECIAL,
@@ -65,7 +65,7 @@ const formatAcademy = (school: string): Academy => {
   return map[school] || map[normalized] || Academy.OTHER;
 };
 
-// --- URL CHECKER ---
+// --- HELPERS ---
 const checkUrlExists = async (url: string): Promise<boolean> => {
   try {
     await axios.head(url, { timeout: 5000 });
@@ -75,21 +75,19 @@ const checkUrlExists = async (url: string): Promise<boolean> => {
   }
 };
 
-// --- NEW: HALO URL GENERATOR ---
 const generateHaloUrl = (name: string): string => {
-  // 1. Format filename: "Aru" -> "Aru_Halo.png"
-  // Spaces must be underscores: "Red Winter" -> "Red_Winter_Halo.png"
   const filename = `${name.replace(/ /g, "_")}_Halo.png`;
-
-  // 2. Calculate MD5 Hash of the filename
   const hash = crypto.createHash("md5").update(filename).digest("hex");
-
-  // 3. Extract path parts
   const a = hash.substring(0, 1);
   const b = hash.substring(0, 2);
-
-  // 4. Construct MediaWiki URL
   return `https://static.wikia.nocookie.net/blue-archive/images/${a}/${b}/${filename}`;
+};
+
+// Parse Height string "156cm" -> 156
+const parseHeight = (heightStr?: string): number => {
+  if (!heightStr) return 0;
+  const match = heightStr.match(/(\d+)/);
+  return match ? parseInt(match[0], 10) : 0;
 };
 
 const importStudents = async () => {
@@ -114,8 +112,6 @@ const importStudents = async () => {
 
     let successCount = 0;
     let skippedCount = 0;
-    let fallbackUsedCount = 0;
-    let haloFoundCount = 0;
 
     for (const s of students) {
       if (!s.IsReleased || !s.IsReleased[0]) {
@@ -133,27 +129,19 @@ const importStudents = async () => {
         const pathName = s.PathName;
         const devName = s.DevName ? s.DevName.toLowerCase() : "";
 
-        // Standard Images
+        // Images
         const studentImage = `https://schaledb.com/images/student/portrait/${studentId}.webp`;
         const gunImage = `https://schaledb.com/images/weapon/weapon_icon_${studentId}.webp`;
         const itemImage = `https://schaledb.com/images/gear/full/${studentId}.webp`;
 
-        // --- HALO LOGIC ---
-        // 1. Default to icon (Safe fallback)
+        // Halo Logic
         let haloImage = `https://schaledb.com/images/student/icon/${studentId}.webp`;
-
-        // 2. Try to generate Wiki URL
         const wikiHaloUrl = generateHaloUrl(s.Name);
-        const isHaloValid = await checkUrlExists(wikiHaloUrl);
-
-        if (isHaloValid) {
+        if (await checkUrlExists(wikiHaloUrl)) {
           haloImage = wikiHaloUrl;
-          haloFoundCount++;
-        } else {
-          // console.log(`   ⚠️ Halo not found on Wiki for ${s.Name}, using icon.`);
         }
 
-        // --- AUDIO LOGIC ---
+        // Audio Logic
         let voiceline = `https://r2.schaledb.com/voice/jp_${pathName}/${pathName}_title.mp3`;
         let isVoiceValid = await checkUrlExists(voiceline);
 
@@ -162,13 +150,12 @@ const importStudents = async () => {
           if (await checkUrlExists(fallbackVoice)) {
             voiceline = fallbackVoice;
             isVoiceValid = true;
-            fallbackUsedCount++;
           }
         }
 
         if (!isVoiceValid) {
-          console.warn(`⚠️  Voice MISSING for ${s.Name}`);
-          // voiceline = ''; // Optional: clear it if you want strictness
+          // We allow importing even without voice, just warn
+          console.warn(`⚠️ Voice missing for ${s.Name}`);
         }
 
         const studentDoc = {
@@ -179,10 +166,20 @@ const importStudents = async () => {
           attackType: ATTACK_TYPE_MAP[s.BulletType] || AttackType.EXPLOSIVE,
           defenseType: DEFENSE_TYPE_MAP[s.ArmorType] || DefenseType.LIGHT,
           academy: formatAcademy(s.School),
+
+          // New Data
+          schoolYear: s.SchoolYear || "Unknown",
+          age: s.CharacterAge || "Unknown",
+          height: parseHeight(s.CharHeightMetric),
+          birthday: s.Birthday || "Unknown",
+          hobby: s.Hobby || "Unknown",
+          club: s.Club || "Unknown",
+          ssrDescription: s.CharacterSSRNew || "",
+
+          haloImage,
           studentImage,
           gunImage,
           itemImage,
-          haloImage,
           voiceline,
         };
 
@@ -201,8 +198,6 @@ const importStudents = async () => {
 
     console.log(`\n\n🎉 Import Complete!`);
     console.log(`✅ Total Processed: ${successCount}`);
-    console.log(`😇 Halos Found: ${haloFoundCount}`);
-    console.log(`🔧 Voices Repaired: ${fallbackUsedCount}`);
     console.log(`⏭️  Skipped: ${skippedCount}`);
   } catch (error) {
     console.error("Fatal Error:", error);
