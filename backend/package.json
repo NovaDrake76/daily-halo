@@ -19,7 +19,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
-    "mongoose": "^9.1.5"
+    "mongoose": "^9.1.5",
+    "vercel": "^50.4.10"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
