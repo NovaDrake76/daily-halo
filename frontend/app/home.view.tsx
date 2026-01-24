@@ -1,5 +1,5 @@
 import React from "react";
-import { GuessResult } from "./home.services";
+import { GuessResult, GameMode } from "./home.services";
 import { IStudent } from "@/types/student.types";
 import { Header } from "./components/home/Header";
 import { Loading } from "./components/home/Loading";
@@ -22,6 +22,8 @@ interface HomeViewProps {
   isGameOver: boolean;
   maxGuesses: number;
   globalWinCount: number;
+  gameMode: GameMode;
+  switchMode: (mode: GameMode) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -29,6 +31,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   searchTerm,
   setSearchTerm,
   searchResults,
+  isSearching,
   handleGuess,
   guesses,
   hasWon,
@@ -37,6 +40,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   targetStudent,
   maxGuesses,
   globalWinCount,
+  gameMode,
+  switchMode,
 }) => {
   const attempts = guesses.length;
   const guessesLeft = maxGuesses - attempts;
@@ -49,6 +54,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             isGameOver={isGameOver}
             guessesLeft={guessesLeft}
             globalWinCount={globalWinCount}
+            gameMode={gameMode}
+            onSwitchMode={switchMode}
           />
 
           {isLoading && <Loading />}
@@ -63,11 +70,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
               setSearchTerm={setSearchTerm}
               searchResults={searchResults}
               handleGuess={handleGuess}
+              isSearching={isSearching}
             />
           )}
 
           {isGameOver && targetStudent && (
-            <GameResult hasWon={hasWon} targetStudent={targetStudent} />
+            <GameResult
+              hasWon={hasWon}
+              targetStudent={targetStudent}
+              gameMode={gameMode}
+              onSwitchMode={switchMode}
+            />
           )}
 
           <GuessList guesses={guesses} />

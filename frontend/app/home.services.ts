@@ -8,6 +8,7 @@ import {
 import { IStudent } from "@/types/student.types";
 
 export type MatchStatus = "CORRECT" | "WRONG" | "HIGHER" | "LOWER" | "PARTIAL";
+export type GameMode = "daily" | "archive";
 
 export interface GuessResult {
   student: IStudent;
@@ -48,10 +49,19 @@ const getNumericComparison = (
 };
 
 export const useHomeService = () => {
-  const { data: targetStudent, isLoading: isLoadingTarget } =
-    useRandomStudent();
+  const [gameMode, setGameMode] = useState<GameMode>("daily");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const { data: targetStudent, isLoading: isLoadingTarget } = useRandomStudent(
+    gameMode,
+    gameMode === "archive" ? refreshKey : 0,
+  );
+
   const { mutate: registerWin } = useRegisterWin();
-  const { data: globalWinCount = 0 } = useDailyWinCount(targetStudent?.name);
+
+  const { data: globalWinCount = 0 } = useDailyWinCount(
+    gameMode === "daily" ? targetStudent?.name : undefined,
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -63,14 +73,17 @@ export const useHomeService = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { data: searchResults = [], isLoading: isSearching } =
+  const { data: searchResults = [], isLoading: isQueryLoading } =
     useStudentSearch(debouncedSearchTerm);
 
   const [guesses, setGuesses] = useState<GuessResult[]>([]);
   const [hasWon, setHasWon] = useState(false);
 
+  const isTyping = searchTerm !== debouncedSearchTerm;
+  const isSearching = isTyping || isQueryLoading;
+
   useEffect(() => {
-    if (!targetStudent || guesses.length > 0) return;
+    if (gameMode !== "daily" || !targetStudent || guesses.length > 0) return;
 
     try {
       const savedData = localStorage.getItem(STORAGE_KEY);
@@ -79,6 +92,7 @@ export const useHomeService = () => {
           JSON.parse(savedData);
 
         if (studentName === targetStudent.name) {
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           setGuesses(storedGuesses);
           setHasWon(storedHasWon);
         } else {
@@ -89,10 +103,10 @@ export const useHomeService = () => {
       console.error(error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetStudent]);
+  }, [targetStudent, gameMode]);
 
   useEffect(() => {
-    if (!targetStudent) return;
+    if (gameMode !== "daily" || !targetStudent) return;
 
     if (guesses.length > 0 || hasWon) {
       const stateToSave = {
@@ -103,7 +117,7 @@ export const useHomeService = () => {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
-  }, [guesses, hasWon, targetStudent]);
+  }, [guesses, hasWon, targetStudent, gameMode]);
 
   const hasLost = guesses.length >= MAX_GUESSES && !hasWon;
   const isGameOver = hasWon || hasLost;
@@ -123,7 +137,6 @@ export const useHomeService = () => {
       student: student,
       matches: {
         rarity: getNumericComparison(targetStudent.rarity, student.rarity),
-
         academy:
           student.academy === targetStudent.academy ? "CORRECT" : "WRONG",
         type: student.type === targetStudent.type ? "CORRECT" : "WRONG",
@@ -134,7 +147,6 @@ export const useHomeService = () => {
           student.defenseType === targetStudent.defenseType
             ? "CORRECT"
             : "WRONG",
-
         height: getNumericComparison(targetStudent.height, student.height),
         age: getNumericComparison(
           parseAge(targetStudent.age),
@@ -152,10 +164,20 @@ export const useHomeService = () => {
 
     if (student.name === targetStudent.name) {
       setHasWon(true);
-      if (!hasWon) {
+      if (!hasWon && gameMode === "daily") {
         registerWin(targetStudent.name);
       }
     }
+  };
+
+  const switchMode = (mode: GameMode) => {
+    if (mode === "archive") {
+      setRefreshKey((prev) => prev + 1);
+    }
+    setGameMode(mode);
+    setGuesses([]);
+    setHasWon(false);
+    setSearchTerm("");
   };
 
   return {
@@ -164,7 +186,7 @@ export const useHomeService = () => {
     searchTerm,
     setSearchTerm,
     searchResults: searchTerm ? searchResults : [],
-    isSearching: isSearching && searchTerm !== debouncedSearchTerm,
+    isSearching,
     handleGuess,
     guesses,
     hasWon,
@@ -172,5 +194,7 @@ export const useHomeService = () => {
     isGameOver,
     maxGuesses: MAX_GUESSES,
     globalWinCount,
+    gameMode,
+    switchMode,
   };
 };

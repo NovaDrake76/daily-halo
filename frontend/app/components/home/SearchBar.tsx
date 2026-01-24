@@ -7,6 +7,7 @@ interface SearchBarProps {
   setSearchTerm: (term: string) => void;
   searchResults: IStudent[];
   handleGuess: (student: IStudent) => void;
+  isSearching: boolean;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -14,6 +15,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   setSearchTerm,
   searchResults,
   handleGuess,
+  isSearching,
 }) => {
   return (
     <div className="relative mb-8 max-w-2xl mx-auto animate-in fade-in duration-500">
@@ -25,19 +27,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         }`}
       >
         <div className="pl-5 text-slate-400">
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2.5"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            ></path>
-          </svg>
+          {isSearching ? (
+            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+          )}
         </div>
         <input
           type="text"
@@ -51,7 +57,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {searchTerm && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 max-h-96 overflow-y-auto">
-          {searchResults.length > 0 ? (
+          {isSearching ? (
+            <div className="p-8 text-center text-slate-400 font-medium flex flex-col items-center gap-2">
+              <div className="w-6 h-6 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+              <span>Searching...</span>
+            </div>
+          ) : searchResults.length > 0 ? (
             searchResults.map((s) => (
               <button
                 key={s._id || s.name}
@@ -71,14 +82,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   <div className="font-bold text-slate-800 text-base mb-1">
                     {s.name}
                   </div>
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
-                    <div className="flex  items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                       <img
                         src={getAcademyLogo(s.academy)}
                         alt={s.academy}
                         className="w-4 h-4 object-contain"
                       />
-                      <span className="text-xs text-slate-500 font-bold uppercase text-center">
+                      <span className="text-xs text-slate-500 font-bold uppercase">
                         {s.academy}
                       </span>
                     </div>

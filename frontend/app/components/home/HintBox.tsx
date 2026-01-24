@@ -38,7 +38,7 @@ export const HintBox: React.FC<HintBoxProps> = ({
               <img
                 src={image}
                 alt={title}
-                className="w-full h-full object-contain max-h-[80px]"
+                className="w-full h-full object-contain max-h-[180px] bg-gray-400 rounded-md"
                 onError={() => setImgError(true)}
               />
             ) : (

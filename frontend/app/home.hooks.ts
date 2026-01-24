@@ -12,14 +12,20 @@ export const useStudentsList = () => {
   });
 };
 
-export const useRandomStudent = () => {
+export const useRandomStudent = (
+  mode: "daily" | "archive",
+  refreshKey: number,
+) => {
   return useQuery({
-    queryKey: ["randomStudent"],
+    queryKey: ["randomStudent", mode, refreshKey],
     queryFn: async () => {
-      const { data } = await axios.get<IStudent>("/api/students/random");
+      const { data } = await axios.get<IStudent>(
+        `/api/students/random?mode=${mode}`,
+      );
       return data;
     },
     refetchOnWindowFocus: false,
+    staleTime: mode === "daily" ? Infinity : 0,
   });
 };
 
