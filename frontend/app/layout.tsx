@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import Providers from "./providers";
 import "./globals.css";
 
@@ -13,7 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const BASE_URL = "https://daily-halo.onrender.com";
+const BASE_URL = "https://daily-halo.com";
+const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -73,6 +75,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {GA_ID && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
+
         <Providers>{children}</Providers>
       </body>
     </html>
