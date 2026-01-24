@@ -47,7 +47,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const guessesLeft = maxGuesses - attempts;
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat bg-fixed font-sans">
+    <div className="min-h-screen font-sans relative">
+      <div className="fixed inset-0 bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat z-[-1]" />
       <div className="py-12 ">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-slate-200 min-h-[80vh]">
           <Header

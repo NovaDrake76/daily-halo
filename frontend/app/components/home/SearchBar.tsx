@@ -82,8 +82,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   <div className="font-bold text-slate-800 text-base mb-1">
                     {s.name}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                  <div className="flex items-start md:items-center gap-2 flex-col md:flex-row ">
+                    <div className="flex  items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                       <img
                         src={getAcademyLogo(s.academy)}
                         alt={s.academy}
