@@ -73,6 +73,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <GuessList guesses={guesses} />
         </div>
       </div>
+      <a
+        href="https://github.com/NovaDrake76/daily-halo"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 right-4 text-sm text-slate-600 hover:text-slate-800"
+      >
+        <img src="/github.png" alt="GitHub" className="inline w-6 h-6 mr-2" />
+      </a>
     </div>
   );
 };
