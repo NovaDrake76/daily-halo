@@ -45,7 +45,7 @@ export const HintBox: React.FC<HintBoxProps> = ({
               <div className="flex flex-col items-center justify-center gap-1">
                 <div className="text-2xl">❓</div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 text-center">
-                  This student don&apos;t have one...
+                  I could not find one for this student, sensei!
                 </span>
               </div>
             )}

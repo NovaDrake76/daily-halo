@@ -7,6 +7,16 @@ interface AronaHintsProps {
   attempts: number;
 }
 
+const censorName = (text: string, name: string) => {
+  if (!text || !name) return text;
+  const baseName = name.split("(")[0].trim();
+
+  const escapedName = baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`\\b${escapedName}\\b`, "gi");
+
+  return text.replace(regex, "****");
+};
+
 export const AronaHints: React.FC<AronaHintsProps> = ({
   targetStudent,
   attempts,
@@ -95,7 +105,12 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                         Birthday: {targetStudent.birthday}
                       </span>
                       <p className="text-xs text-slate-600 italic line-clamp-3">
-                        &quot;{targetStudent.ssrDescription}&quot;
+                        &quot;
+                        {censorName(
+                          targetStudent.ssrDescription,
+                          targetStudent.name,
+                        )}
+                        &quot;
                       </p>
                     </div>
                   ) : (
