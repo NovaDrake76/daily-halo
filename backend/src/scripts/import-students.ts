@@ -135,10 +135,12 @@ const importStudents = async () => {
         const itemImage = `https://schaledb.com/images/gear/full/${studentId}.webp`;
 
         // Halo Logic
-        let haloImage = `https://schaledb.com/images/student/icon/${studentId}.webp`;
+        let haloImage = "";
         const wikiHaloUrl = generateHaloUrl(s.Name);
         if (await checkUrlExists(wikiHaloUrl)) {
           haloImage = wikiHaloUrl;
+        } else {
+          console.warn(`⚠️ Halo missing for ${s.Name}`);
         }
 
         // Audio Logic

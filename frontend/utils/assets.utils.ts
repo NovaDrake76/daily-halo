@@ -1,7 +1,7 @@
 import { Academy } from "@/types/student.types";
 
 export const getAcademyLogo = (academy: string | Academy): string => {
-  if (!academy) return "/logos/Schale_Icon.webp"; // Fallback if needed
+  if (!academy) return "";
 
   const name = academy.toString().trim();
 
@@ -44,6 +44,10 @@ export const getAcademyLogo = (academy: string | Academy): string => {
 
     case "Shanhaijing":
       return "/logos/Shanhaijing_Icon.webp";
+
+    case "Other":
+    case "ETC":
+      return "";
 
     default:
       const formatted =

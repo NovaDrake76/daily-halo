@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { IStudent } from "@/types/student.types";
 import { HintBox } from "./HintBox";
+import { isHaloAvailable, isReadableHint } from "@/utils/student.utils";
 
 interface AronaHintsProps {
   targetStudent: IStudent;
@@ -17,14 +18,33 @@ const censorName = (text: string, name: string) => {
   return text.replace(regex, "****");
 };
 
+const lockLabel = (fails: number) =>
+  `Locked (${fails} Fail${fails === 1 ? "" : "s"})`;
+
 export const AronaHints: React.FC<AronaHintsProps> = ({
   targetStudent,
   attempts,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | undefined>(0);
-  const showRow2 = attempts >= 3;
-  const showRow3 = attempts >= 4;
+
+  const haloAvailable = isHaloAvailable(targetStudent.haloImage);
+  const hobbyAvailable = isReadableHint(targetStudent.hobby);
+  const ssrAvailable = isReadableHint(targetStudent.ssrDescription);
+
+  const preHobbyShift = haloAvailable ? 0 : 1;
+  const postHobbyShift = preHobbyShift + (hobbyAvailable ? 0 : 1);
+
+  const haloUnlock = 1;
+  const hobbyUnlock = 2 - preHobbyShift;
+  const weaponUnlock = 3 - postHobbyShift;
+  const ssrUnlock = 4 - postHobbyShift;
+  const gearUnlock = 5 - postHobbyShift;
+  const voiceUnlock = 6 - postHobbyShift;
+  const clubUnlock = 7 - postHobbyShift;
+
+  const showRow2 = attempts >= ssrUnlock - 1;
+  const showRow3 = attempts >= gearUnlock - 1;
 
   useEffect(() => {
     if (containerRef.current) {
@@ -55,29 +75,37 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                 <HintBox
                   title="Halo Pattern"
                   image={targetStudent.haloImage}
-                  isLocked={attempts < 1}
-                  lockLabel="Locked (1 Fail)"
+                  isLocked={attempts < haloUnlock}
+                  lockLabel={lockLabel(haloUnlock)}
                   delay={0}
+                  unavailable={!haloAvailable}
+                  unavailableLabel="I have no halo for this student, sensei!"
                 />
               </div>
               <div
                 className={`
                   col-span-1 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px]
-                  ${attempts >= 2 ? "bg-pink-50 border-pink-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                  ${attempts >= hobbyUnlock ? "bg-pink-50 border-pink-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
                `}
               >
-                {attempts >= 2 ? (
+                {attempts >= hobbyUnlock ? (
                   <div className="text-center animate-in zoom-in w-full">
                     <span className="text-xs font-bold text-pink-400 uppercase tracking-widest block mb-1">
                       Hobby
                     </span>
-                    <p className="font-bold text-slate-700 text-sm md:text-base leading-tight">
-                      {targetStudent.hobby}
-                    </p>
+                    {hobbyAvailable ? (
+                      <p className="font-bold text-slate-700 text-sm md:text-base leading-tight">
+                        {targetStudent.hobby}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic leading-tight">
+                        I could not translate this one, sensei!
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
-                    Locked (2 Fails)
+                    {lockLabel(hobbyUnlock)}
                   </span>
                 )}
               </div>
@@ -86,8 +114,8 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                 <HintBox
                   title="Weapon"
                   image={targetStudent.gunImage}
-                  isLocked={attempts < 3}
-                  lockLabel="Locked (3 Fails)"
+                  isLocked={attempts < weaponUnlock}
+                  lockLabel={lockLabel(weaponUnlock)}
                   delay={100}
                 />
               </div>
@@ -96,26 +124,28 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                 <div
                   className={`
                     col-span-2 md:col-span-4 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[100px] animate-in fade-in slide-in-from-top-2
-                    ${attempts >= 4 ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                    ${attempts >= ssrUnlock ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
                  `}
                 >
-                  {attempts >= 4 ? (
+                  {attempts >= ssrUnlock ? (
                     <div className="text-center animate-in zoom-in">
                       <span className="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-1">
                         Birthday: {targetStudent.birthday}
                       </span>
-                      <p className="text-xs text-slate-600 italic line-clamp-3">
-                        &quot;
-                        {censorName(
-                          targetStudent.ssrDescription,
-                          targetStudent.name,
-                        )}
-                        &quot;
-                      </p>
+                      {ssrAvailable && (
+                        <p className="text-xs text-slate-600 italic line-clamp-3">
+                          &quot;
+                          {censorName(
+                            targetStudent.ssrDescription,
+                            targetStudent.name,
+                          )}
+                          &quot;
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Locked (4 Fails)
+                      {lockLabel(ssrUnlock)}
                     </span>
                   )}
                 </div>
@@ -130,8 +160,8 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                     <HintBox
                       title="Unique Gear"
                       image={targetStudent.itemImage}
-                      isLocked={attempts < 5}
-                      lockLabel="Locked (5 Fails)"
+                      isLocked={attempts < gearUnlock}
+                      lockLabel={lockLabel(gearUnlock)}
                       delay={200}
                     />
                   </div>
@@ -139,11 +169,11 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                   <div
                     className={`
                       col-span-1 md:col-span-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
-                      ${attempts >= 6 ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                      ${attempts >= voiceUnlock ? "bg-indigo-50 border-indigo-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
                    `}
                     style={{ animationDelay: "150ms" }}
                   >
-                    {attempts >= 6 ? (
+                    {attempts >= voiceUnlock ? (
                       <div className="flex flex-col items-center w-full animate-in zoom-in duration-300">
                         <span className="text-2xl mb-2">🔊</span>
                         <audio
@@ -161,7 +191,7 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                           🔇
                         </div>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Locked (6 Fails)
+                          {lockLabel(voiceUnlock)}
                         </span>
                       </div>
                     )}
@@ -170,11 +200,11 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                   <div
                     className={`
                       col-span-2 md:col-span-2 flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-500 min-h-[140px] animate-in fade-in slide-in-from-top-2
-                      ${attempts >= 7 ? "bg-purple-50 border-purple-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
+                      ${attempts >= clubUnlock ? "bg-purple-50 border-purple-200" : "bg-slate-50 border-slate-200 border-dashed opacity-60"}
                    `}
                     style={{ animationDelay: "200ms" }}
                   >
-                    {attempts >= 7 ? (
+                    {attempts >= clubUnlock ? (
                       <div className="text-center animate-in zoom-in w-full">
                         <span className="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-1">
                           Club
@@ -185,7 +215,7 @@ export const AronaHints: React.FC<AronaHintsProps> = ({
                       </div>
                     ) : (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
-                        Locked (7 Fails)
+                        {lockLabel(clubUnlock)}
                       </span>
                     )}
                   </div>

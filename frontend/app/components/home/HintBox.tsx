@@ -6,6 +6,8 @@ interface HintBoxProps {
   isLocked: boolean;
   lockLabel: string;
   delay: number;
+  unavailable?: boolean;
+  unavailableLabel?: string;
 }
 
 export const HintBox: React.FC<HintBoxProps> = ({
@@ -14,8 +16,15 @@ export const HintBox: React.FC<HintBoxProps> = ({
   isLocked,
   lockLabel,
   delay,
+  unavailable = false,
+  unavailableLabel = "Not available for this student, sensei!",
 }) => {
   const [imgError, setImgError] = useState(false);
+
+  const missing = unavailable || !image || imgError;
+  const message = unavailable
+    ? unavailableLabel
+    : "I could not find one for this student, sensei!";
 
   return (
     <div
@@ -34,20 +43,20 @@ export const HintBox: React.FC<HintBoxProps> = ({
       ) : (
         <div className="flex flex-col items-center animate-in zoom-in duration-300 w-full h-full justify-between">
           <div className="flex-1 w-full flex items-center justify-center mb-2 overflow-hidden">
-            {image && !imgError ? (
+            {missing ? (
+              <div className="flex flex-col items-center justify-center gap-1">
+                <div className="text-2xl">❓</div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 text-center">
+                  {message}
+                </span>
+              </div>
+            ) : (
               <img
                 src={image}
                 alt={title}
                 className="w-full h-full object-contain max-h-[180px] bg-gray-400 rounded-md"
                 onError={() => setImgError(true)}
               />
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-1">
-                <div className="text-2xl">❓</div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 text-center">
-                  I could not find one for this student, sensei!
-                </span>
-              </div>
             )}
           </div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">

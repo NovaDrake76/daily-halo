@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MatchStatus } from "../../home.services";
 
 interface AttributeBoxProps {
@@ -16,6 +16,9 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
   delay,
   icon,
 }) => {
+  const [iconError, setIconError] = useState(false);
+  const showIcon = !!icon && !iconError;
+
   let bgColor = "bg-white";
   let borderColor = "border-slate-200";
   let textColor = "text-slate-800";
@@ -73,9 +76,13 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
     `}
       style={{ animationDelay: `${delay}ms` }}
     >
-      {icon && (
+      {showIcon && (
         <div className="absolute opacity-10 w-full h-full flex items-center justify-center pointer-events-none grayscale scale-150">
-          <img src={icon} className="w-full h-full object-contain" />
+          <img
+            src={icon}
+            className="w-full h-full object-contain"
+            onError={() => setIconError(true)}
+          />
         </div>
       )}
 
@@ -86,11 +93,12 @@ export const AttributeBox: React.FC<AttributeBoxProps> = ({
       <div className="flex items-center gap-1 z-10">
         <span className="text-xs md:text-sm font-black uppercase text-center leading-tight truncate px-1">
           {value}
-          {icon && (
+          {showIcon && (
             <img
               src={icon}
               alt={label}
               className="inline-block w-8 h-8 object-contain ml-1 -mt-1"
+              onError={() => setIconError(true)}
             />
           )}
         </span>

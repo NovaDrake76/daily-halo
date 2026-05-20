@@ -34,7 +34,7 @@ const StudentSchema: Schema = new Schema(
     hobby: { type: String, required: false, default: "Unknown" },
     club: { type: String, required: false, default: "Unknown" },
     ssrDescription: { type: String, required: false, default: "" },
-    haloImage: { type: String, required: true },
+    haloImage: { type: String, required: false, default: "" },
     studentImage: { type: String, required: true },
     gunImage: { type: String, required: true },
     itemImage: { type: String, required: true },

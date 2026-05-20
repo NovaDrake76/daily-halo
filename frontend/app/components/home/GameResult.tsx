@@ -17,6 +17,7 @@ export const GameResult: React.FC<GameResultProps> = ({
   onSwitchMode,
 }) => {
   const discordUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL;
+  const academyLogo = getAcademyLogo(targetStudent.academy);
 
   return (
     <div className="mb-8 animate-in zoom-in duration-500">
@@ -50,13 +51,15 @@ export const GameResult: React.FC<GameResultProps> = ({
                   alt="Result"
                   className={`relative w-40 h-40 rounded-full ring-8 shadow-2xl object-cover object-top ${hasWon ? "ring-white" : "ring-slate-500 grayscale"}`}
                 />
-                <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-black/10">
-                  <img
-                    src={getAcademyLogo(targetStudent.academy)}
-                    alt={targetStudent.academy}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+                {academyLogo && (
+                  <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-white rounded-full p-2 shadow-lg flex items-center justify-center ring-4 ring-black/10">
+                    <img
+                      src={academyLogo}
+                      alt={targetStudent.academy}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="text-2xl font-black uppercase tracking-wider">
